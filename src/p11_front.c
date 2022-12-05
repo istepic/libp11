@@ -371,15 +371,17 @@ int PKCS11_set_ui_method(PKCS11_CTX *pctx, UI_METHOD *ui_method, void *ui_user_d
 
 int PKCS11_generate_key(PKCS11_TOKEN *token, PKCS11_KGEN_ATTRS *kg)
 {
+	if (token == NULL || kg == NULL)
+		return -1;
 	PKCS11_SLOT_private *slot = PRIVSLOT(token->slot);
 	if (check_slot_fork(slot) < 0)
 		return -1;
 	unsigned char out[128] = {0};
 	size_t key_id_len = 0;
-	if (kg && kg->key_id) {
-		key_id_len = strnlen(kg->key_id, 127);
-		if (key_id_len > 127) {
-			return -2;
+	if (kg->key_id) {
+		key_id_len = strnlen(kg->key_id, 128);
+		if (key_id_len == 128) {
+			return -1;
 		}
 		pkcs11_hex_to_bin(kg->key_id, out, &key_id_len);
 	}
@@ -391,7 +393,7 @@ int PKCS11_generate_key(PKCS11_TOKEN *token, PKCS11_KGEN_ATTRS *kg)
 		return pkcs11_ec_keygen(slot, kg->kgen.ec->curve,
 				kg->key_label, out, key_id_len);
 	default:
-		return -3;
+		return -1;
 	}
 }
 

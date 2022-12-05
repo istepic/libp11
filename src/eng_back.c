@@ -892,6 +892,8 @@ EVP_PKEY *ctx_load_privkey(ENGINE_CTX *ctx, const char *s_key_id,
 
 static int ctx_keygen(ENGINE_CTX *ctx, void *p)
 {
+	if (p == NULL)
+		return 0;
 	int rv = 1;
 	unsigned int i;
 	PKCS11_KGEN_ATTRS *kg_attrs = p;

@@ -103,6 +103,7 @@ static int sign_verify_test(EVP_PKEY *priv, EVP_PKEY *pub) {
 	{
 		printf("Verify success\n");
 		retval = 0;
+		goto err;
 	}
 	else
 	{
