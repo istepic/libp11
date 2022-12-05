@@ -323,6 +323,7 @@ int pkcs11_ec_keygen(PKCS11_SLOT_private *slot, const char *curve,
 
 	unsigned char *ecdsa_params = NULL;
 	int ecdsa_params_len = 0;
+	unsigned char *tmp = NULL;
 	ASN1_OBJECT *curve_obj = NULL;
 	int curve_nid = NID_undef;
 
@@ -345,6 +346,8 @@ int pkcs11_ec_keygen(PKCS11_SLOT_private *slot, const char *curve,
 	ecdsa_params = (unsigned char *)OPENSSL_malloc(ecdsa_params_len);
 	if (!ecdsa_params)
 		return -1;
+	tmp = ecdsa_params;
+	i2d_ASN1_OBJECT(curve_obj, &tmp);
 
 	/* pubkey attributes */
 	pkcs11_addattr(&pubtmpl, CKA_ID, id, id_len);
