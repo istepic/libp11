@@ -377,7 +377,7 @@ int PKCS11_generate_key(PKCS11_TOKEN *token, PKCS11_KGEN_ATTRS *kg)
 	unsigned char out[128] = {0};
 	size_t key_id_len = 0;
 	if (kg && kg->key_id) {
-		key_id_len = strlen(kg->key_id);
+		key_id_len = strnlen(kg->key_id, 127);
 		if (key_id_len > 127) {
 			return -2;
 		}

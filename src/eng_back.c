@@ -893,7 +893,7 @@ EVP_PKEY *ctx_load_privkey(ENGINE_CTX *ctx, const char *s_key_id,
 static int ctx_keygen(ENGINE_CTX *ctx, void *p)
 {
 	int rv = 1;
-	int i;
+	unsigned int i;
 	PKCS11_KGEN_ATTRS *kg_attrs = p;
 	PKCS11_SLOT* slot = NULL;
 
@@ -905,7 +905,6 @@ static int ctx_keygen(ENGINE_CTX *ctx, void *p)
 	}
 
 	// Take the first token that has a matching label
-	// TODO: make this more intelligent
 	for (i = 0; i < ctx->slot_count; ++i) {
 		slot = ctx->slot_list + i;
 		if (slot && slot->token && slot->token->initialized &&
@@ -920,6 +919,10 @@ static int ctx_keygen(ENGINE_CTX *ctx, void *p)
 		goto done;
 	}
 
+	/* If login is not forced, try to generate key without logging in first.
+	 * PKCS11_generate_key will fail if login is required so function will
+	 * continue and try to login first
+	 */
 	if (!ctx->force_login) {
 		ERR_clear_error();
 		rv = PKCS11_generate_key(slot->token, kg_attrs);

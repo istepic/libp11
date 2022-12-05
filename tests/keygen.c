@@ -55,7 +55,8 @@ static int sign_verify_test(EVP_PKEY *priv, EVP_PKEY *pub) {
 		fprintf(stderr, "Where are the keys?\n");
 		return -1;
 	}
-	if(!(mdctx = EVP_MD_CTX_create())) {
+	mdctx = EVP_MD_CTX_create();
+	if(!mdctx) {
 		display_openssl_errors(__LINE__);
 		retval = -2;
 		goto err;
@@ -156,7 +157,10 @@ main(int argc, char* argv[])
 		display_openssl_errors(__LINE__);
 		exit(1);
 	}
-
+    
+    /*
+     * EC key generation test
+     */
 	PKCS11_EC_KGEN ec = {
 		.curve = "P-256"
 	};
@@ -180,6 +184,10 @@ main(int argc, char* argv[])
 		fprintf(stderr, "ECC Sign-verify failed with err code: %d\n", ret);
 		exit(1);
 	}
+
+    /*
+     * RSA key generation test
+     */
 	PKCS11_RSA_KGEN rsa = {
 		.bits = 2048
 	};

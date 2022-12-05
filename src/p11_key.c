@@ -267,7 +267,7 @@ int pkcs11_rsa_keygen(PKCS11_SLOT_private *slot, unsigned int bits,
 	int rv;
 
 	if (pkcs11_get_session(slot, 1, &session))
-		return -10;
+		return -1;
 
 	/* pubkey attributes */
 	pkcs11_addattr(&pubtmpl, CKA_ID, id, id_len);
@@ -323,12 +323,11 @@ int pkcs11_ec_keygen(PKCS11_SLOT_private *slot, const char *curve,
 
 	unsigned char *ecdsa_params = NULL;
 	int ecdsa_params_len = 0;
-	unsigned char *tmp = NULL;
 	ASN1_OBJECT *curve_obj = NULL;
 	int curve_nid = NID_undef;
 
 	if (pkcs11_get_session(slot, 1, &session)) {
-		return -20;
+		return -1;
 	}
 
 	curve_nid = EC_curve_nist2nid(curve);
@@ -337,24 +336,22 @@ int pkcs11_ec_keygen(PKCS11_SLOT_private *slot, const char *curve,
 	if (curve_nid == NID_undef)
 		curve_nid = OBJ_ln2nid(curve);
 	if (curve_nid == NID_undef)
-		return -21;
+		return -1;
 
 	curve_obj = OBJ_nid2obj(curve_nid);
 	if (!curve_obj)
-		return -22;
+		return -1;
 	ecdsa_params_len = i2d_ASN1_OBJECT(curve_obj, NULL);
 	ecdsa_params = (unsigned char *)OPENSSL_malloc(ecdsa_params_len);
 	if (!ecdsa_params)
-		return -23;
-	tmp = ecdsa_params;
-	i2d_ASN1_OBJECT(curve_obj, &tmp);
+		return -1;
 
 	/* pubkey attributes */
 	pkcs11_addattr(&pubtmpl, CKA_ID, id, id_len);
 	if (label)
 		pkcs11_addattr_s(&pubtmpl, CKA_LABEL, label);
 	pkcs11_addattr_bool(&pubtmpl, CKA_TOKEN, TRUE);
-	pkcs11_addattr_bool(&pubtmpl, CKA_DERIVE, TRUE);
+	pkcs11_addattr_bool(&pubtmpl, CKA_DERIVE, FALSE);
 	pkcs11_addattr_bool(&pubtmpl, CKA_WRAP, FALSE);
 	pkcs11_addattr_bool(&pubtmpl, CKA_VERIFY, TRUE);
 	pkcs11_addattr_bool(&pubtmpl, CKA_VERIFY_RECOVER, FALSE);
