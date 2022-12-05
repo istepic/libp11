@@ -120,6 +120,9 @@ typedef struct PKCS11_rsa_kgen_st {
 } PKCS11_RSA_KGEN;
 
 typedef struct PKCS11_kgen_attrs_st {
+	/* Key generation type from OpenSSL. Given the union below this should
+	 * be either EVP_PKEY_EC or EVP_PKEY_RSA
+	 */
 	int type;
 	union {
 		PKCS11_EC_KGEN *ec;
